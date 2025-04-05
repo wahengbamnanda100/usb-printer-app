@@ -3,6 +3,7 @@ const cors = require("cors");
 const ThermalPrinter = require("node-thermal-printer").printer;
 const PrinterTypes = require("node-thermal-printer").types;
 const path = require("path");
+const usb = require("usb");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -14,6 +15,17 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "..", "client", "dist")));
 
 app.post("/api/print", async (req, res) => {
+	const devices = usb.getDeviceList();
+
+	devices.forEach((device, index) => {
+		const { idVendor, idProduct, deviceDescriptor } = device;
+
+		console.log(`Device #${index + 1}`);
+		console.log(`Vendor ID: 0x${idVendor.toString(16)}`);
+		console.log(`Product ID: 0x${idProduct.toString(16)}`);
+		console.log("-------------");
+	});
+
 	const printer = new ThermalPrinter({
 		type: PrinterTypes.EPSON,
 		interface: "usb",
